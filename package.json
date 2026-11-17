@@ -1,0 +1,13 @@
+{
+  "name": "original-template",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host --port 5173",
+    "bridge": "node jarvis/bridge/server.mjs"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  }
+}

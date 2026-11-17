@@ -1,0 +1,3194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>SPARK — Intelligent Core</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --white: #ffffff;
+      --muted: rgba(255, 255, 255, 0.68);
+      --border: rgba(255, 255, 255, 0.28);
+
+      --side-space: clamp(28px, 5.25vw, 94px);
+      --nav-height: 104px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      overflow: hidden;
+      color: var(--white);
+      background: #000;
+      font-family: "Inter", Arial, sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    .site {
+      position: relative;
+      width: 100%;
+      min-height: 100svh;
+      overflow: hidden;
+      background: #000;
+      isolation: isolate;
+    }
+
+    /* ─────────────────────────────
+       NAVIGATION
+    ───────────────────────────── */
+
+    .nav {
+      position: absolute;
+      z-index: 30;
+      top: 0;
+      left: 0;
+
+      width: 100%;
+      height: var(--nav-height);
+      padding: 0 var(--side-space);
+
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+
+      /*
+        No navbar container.
+        The navigation now rests directly over the video.
+      */
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .logo {
+      width: fit-content;
+
+      color: #fff;
+
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(34px, 3.4vw, 62px);
+    }
+
+    .nav-link {
+      position: relative;
+      padding: 10px 0;
+
+      color: rgba(255, 255, 255, 0.82);
+
+      font-size: 10px;
+      font-weight: 500;
+
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.8);
+
+      transition: color 220ms ease;
+    }
+
+    .nav-link::after {
+      content: "";
+
+      position: absolute;
+      right: 100%;
+      bottom: 2px;
+      left: 0;
+
+      height: 1px;
+
+      background: #fff;
+
+      transition: right 250ms ease;
+    }
+
+    .nav-link:hover {
+      color: #fff;
+    }
+
+    .nav-link:hover::after {
+      right: 0;
+    }
+
+    .nav-action-wrap {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .nav-action {
+      min-height: 42px;
+      padding: 0 22px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 999px;
+
+      color: #fff;
+      background: rgba(0, 0, 0, 0.12);
+
+      font-size: 9px;
+      font-weight: 500;
+
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+
+      transition:
+        color 250ms ease,
+        background 250ms ease,
+        transform 250ms ease;
+    }
+
+    .nav-action:hover {
+      color: #050505;
+      background: #fff;
+      transform: translateY(-2px);
+    }
+
+    .menu-button {
+      display: none;
+
+      width: 42px;
+      height: 42px;
+
+      border: 1px solid var(--border);
+      border-radius: 50%;
+
+      background: rgba(0, 0, 0, 0.12);
+
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .menu-button span {
+      display: block;
+
+      width: 15px;
+      height: 1px;
+
+      margin: 4px auto;
+
+      background: #fff;
+    }
+
+    .mobile-panel {
+      position: absolute;
+      z-index: 29;
+
+      top: var(--nav-height);
+      right: 18px;
+      left: 18px;
+
+      padding: 28px;
+
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-12px);
+
+      background: rgba(5, 5, 5, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
+      transition:
+        opacity 250ms ease,
+        visibility 250ms ease,
+        transform 250ms ease;
+    }
+
+    .mobile-panel.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .mobile-panel a {
+      font-size: 13px;
+    }
+
+    /* ─────────────────────────────
+       HERO
+    ───────────────────────────── */
+
+    .hero {
+      position: relative;
+
+      width: 100%;
+      min-height: 100svh;
+
+      overflow: hidden;
+      background: #000;
+      isolation: isolate;
+    }
+
+    .hero-video {
+      position: absolute;
+      z-index: -5;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+      object-position: center;
+
+      transform: scale(1.025);
+
+      filter:
+        brightness(0.7)
+        contrast(1.18)
+        saturate(0.92);
+
+      transition: transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .hero:hover .hero-video {
+      transform: scale(1.045);
+    }
+
+    .video-overlay {
+      display: none;
+    }
+
+    .hero-vignette {
+      position: absolute;
+      z-index: -3;
+      inset: 0;
+
+      pointer-events: none;
+
+      box-shadow:
+        inset 0 0 150px rgba(0, 0, 0, 0.55),
+        inset 0 -90px 110px rgba(0, 0, 0, 0.46);
+    }
+
+    .grain {
+      position: absolute;
+      z-index: 20;
+      inset: 0;
+
+      opacity: 0.045;
+      pointer-events: none;
+      mix-blend-mode: soft-light;
+
+      background-image:
+        radial-gradient(
+          rgba(255, 255, 255, 0.75) 0.55px,
+          transparent 0.7px
+        );
+
+      background-size: 5px 5px;
+    }
+
+    /* ─────────────────────────────
+       LARGE CENTER TITLE
+    ───────────────────────────── */
+
+    .mega-title {
+      position: absolute;
+      z-index: 8;
+
+      top: 51.5%;
+      left: 50%;
+
+      width: calc(100% - (var(--side-space) * 1.55));
+
+      transform: translate(-50%, -50%);
+
+      color: #fff;
+
+      font-family: "Montserrat", sans-serif;
+      font-size: clamp(58px, 7.7vw, 138px);
+      font-weight: 400;
+      line-height: 1;
+
+      letter-spacing: 0.29em;
+      text-align: center;
+      text-indent: 0.29em;
+      white-space: nowrap;
+
+      pointer-events: none;
+
+      text-shadow:
+        0 4px 26px rgba(0, 0, 0, 0.36),
+        0 0 10px rgba(0, 0, 0, 0.18);
+
+      will-change: transform;
+    }
+
+    /* ─────────────────────────────
+       LEFT CONTENT
+    ───────────────────────────── */
+
+    .left-content {
+      position: absolute;
+      z-index: 12;
+
+      top: 34.5%;
+      left: var(--side-space);
+
+      width: clamp(225px, 18vw, 290px);
+    }
+
+    .left-kicker,
+    .right-kicker {
+      color: #fff;
+
+      font-size: clamp(11px, 0.82vw, 14px);
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      text-transform: uppercase;
+
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+    }
+
+    /*
+      This lower block contains both the description
+      and CTA, keeping them perfectly aligned.
+    */
+
+    .left-lower-content {
+      margin-top: clamp(210px, 24vh, 260px);
+
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .description {
+      width: 100%;
+      max-width: 275px;
+
+      color: rgba(255, 255, 255, 0.72);
+
+      font-size: clamp(10px, 0.7vw, 12px);
+      font-weight: 400;
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+    }
+
+    .primary-action {
+      margin-top: 21px;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .action-pill {
+      height: 42px;
+      padding: 0 23px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 999px;
+
+      color: #fff;
+      background: rgba(0, 0, 0, 0.12);
+
+      font-size: 9px;
+      font-weight: 500;
+
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+
+      transition:
+        color 250ms ease,
+        background 250ms ease,
+        border-color 250ms ease;
+    }
+
+    .action-arrow {
+      width: 42px;
+      height: 42px;
+
+      display: grid;
+      place-items: center;
+
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 50%;
+
+      background: rgba(0, 0, 0, 0.12);
+
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+
+      transition:
+        color 250ms ease,
+        background 250ms ease,
+        transform 250ms ease;
+    }
+
+    .action-arrow svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .primary-action:hover .action-pill,
+    .primary-action:hover .action-arrow {
+      color: #050505;
+      background: #fff;
+      border-color: #fff;
+    }
+
+    .primary-action:hover .action-arrow {
+      transform: rotate(-45deg);
+    }
+
+    /* ─────────────────────────────
+       RIGHT CONTENT
+    ───────────────────────────── */
+
+    .right-content {
+      position: absolute;
+      z-index: 12;
+
+      top: 54.5%;
+      right: var(--side-space);
+
+      transform: translateY(-50%);
+    }
+
+    /* ─────────────────────────────
+       SCROLL CIRCLE
+    ───────────────────────────── */
+
+    .scroll-circle {
+      position: absolute;
+      z-index: 12;
+
+      bottom: 34px;
+      left: var(--side-space);
+
+      width: 82px;
+      height: 82px;
+
+      display: grid;
+      place-items: center;
+
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      border-radius: 50%;
+
+      background: rgba(0, 0, 0, 0.15);
+
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .circle-text {
+      position: absolute;
+      inset: 5px;
+
+      animation: rotateCircle 14s linear infinite;
+    }
+
+    .circle-text span {
+      position: absolute;
+      top: 0;
+      left: 50%;
+
+      height: 36px;
+
+      color: rgba(255, 255, 255, 0.7);
+
+      font-size: 5px;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+
+      transform-origin: 0 35px;
+    }
+
+    .scroll-arrow {
+      position: relative;
+      z-index: 2;
+
+      width: 18px;
+      height: 18px;
+
+      animation: arrowBounce 1.8s ease-in-out infinite;
+    }
+
+    /* ─────────────────────────────
+       SOCIAL ICONS
+    ───────────────────────────── */
+
+    .socials {
+      position: absolute;
+      z-index: 12;
+
+      right: var(--side-space);
+      bottom: 47px;
+
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .social-link {
+      width: 18px;
+      height: 18px;
+
+      display: grid;
+      place-items: center;
+
+      opacity: 0.82;
+
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
+
+      transition:
+        opacity 220ms ease,
+        transform 220ms ease;
+    }
+
+    .social-link:hover {
+      opacity: 1;
+      transform: translateY(-3px);
+    }
+
+    .social-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ─────────────────────────────
+       INTRO ANIMATIONS
+    ───────────────────────────── */
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+
+      animation:
+        revealUp 850ms
+        cubic-bezier(0.2, 0.8, 0.2, 1)
+        forwards;
+    }
+
+    .logo {
+      animation-delay: 80ms;
+    }
+
+    .nav-links {
+      animation-delay: 150ms;
+    }
+
+    .nav-action-wrap {
+      animation-delay: 220ms;
+    }
+
+    .left-content {
+      animation-delay: 340ms;
+    }
+
+    .right-content {
+      animation-delay: 480ms;
+    }
+
+    .scroll-circle {
+      animation-delay: 620ms;
+    }
+
+    .socials {
+      animation-delay: 700ms;
+    }
+
+    .mega-title {
+      opacity: 0;
+
+      animation:
+        titleReveal 1.15s 400ms
+        cubic-bezier(0.15, 0.8, 0.2, 1)
+        forwards;
+    }
+
+    @keyframes revealUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes titleReveal {
+      from {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translate(-50%, -44%) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    @keyframes rotateCircle {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes arrowBounce {
+      0%,
+      100% {
+        transform: translateY(-2px);
+      }
+
+      50% {
+        transform: translateY(3px);
+      }
+    }
+
+    /* ─────────────────────────────
+       TABLET
+    ───────────────────────────── */
+
+    @media (max-width: 1050px) {
+      :root {
+        --side-space: clamp(28px, 4vw, 50px);
+      }
+
+      .mega-title {
+        width: calc(100% - 70px);
+
+        font-size: clamp(50px, 8vw, 88px);
+
+        letter-spacing: 0.23em;
+        text-indent: 0.23em;
+      }
+
+      .left-content {
+        top: 32%;
+      }
+
+      .left-lower-content {
+        margin-top: clamp(150px, 19vh, 190px);
+      }
+    }
+
+    /* ─────────────────────────────
+       MOBILE
+    ───────────────────────────── */
+
+    @media (max-width: 760px) {
+      :root {
+        --side-space: 21px;
+        --nav-height: 78px;
+      }
+
+      body {
+        overflow: auto;
+      }
+
+      .nav {
+        grid-template-columns: 1fr auto;
+      }
+
+      .nav-links,
+      .nav-action-wrap {
+        display: none;
+      }
+
+      .menu-button {
+        display: block;
+      }
+
+      .hero-video {
+        object-position: center;
+      }
+
+      .mega-title {
+        top: 35%;
+        width: calc(100% - 30px);
+
+        white-space: normal;
+        word-break: break-word;
+
+        font-size: clamp(42px, 13vw, 72px);
+        line-height: 0.94;
+
+        letter-spacing: 0.14em;
+        text-indent: 0.14em;
+      }
+
+      .left-content {
+        top: auto;
+        bottom: 123px;
+
+        width: min(75%, 290px);
+      }
+
+      .left-lower-content {
+        margin-top: 18px;
+      }
+
+      .left-kicker {
+        font-size: 11px;
+      }
+
+      .description {
+        max-width: 255px;
+        font-size: 10px;
+      }
+
+      .right-content {
+        top: 102px;
+        right: var(--side-space);
+
+        transform: none;
+      }
+
+      .right-kicker {
+        font-size: 9px;
+      }
+
+      .scroll-circle {
+        bottom: 22px;
+
+        width: 70px;
+        height: 70px;
+      }
+
+      .circle-text span {
+        height: 30px;
+        transform-origin: 0 29px;
+      }
+
+      .socials {
+        right: var(--side-space);
+        bottom: 44px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .mega-title {
+        font-size: clamp(37px, 12vw, 54px);
+      }
+
+      .description {
+        max-width: 225px;
+      }
+
+      .action-pill {
+        height: 38px;
+        padding: 0 18px;
+      }
+
+      .action-arrow {
+        width: 38px;
+        height: 38px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    #particleCanvas {
+      filter: none;
+    }
+
+    /* Temporary Test Controls (High Visibility & Fixed Bottom-Center) */
+    .test-controls {
+      position: fixed !important;
+      bottom: 30px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 999999 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      padding: 6px 10px !important;
+      border-radius: 999px !important;
+      background: rgba(14, 6, 22, 0.9) !important;
+      border: 1px solid rgba(186, 104, 200, 0.45) !important;
+      backdrop-filter: blur(16px) !important;
+      -webkit-backdrop-filter: blur(16px) !important;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.85), 0 0 15px rgba(156, 39, 176, 0.25) !important;
+      pointer-events: auto !important;
+    }
+
+    .test-btn {
+      padding: 8px 20px !important;
+      border-radius: 999px !important;
+      border: 1px solid transparent !important;
+      background: transparent !important;
+      color: rgba(255, 255, 255, 0.72) !important;
+      font-family: inherit !important;
+      font-size: 11px !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.12em !important;
+      cursor: pointer !important;
+      outline: none !important;
+      transition: all 200ms ease !important;
+      user-select: none !important;
+    }
+
+    .test-btn:hover {
+      color: #ffffff !important;
+      background: rgba(186, 104, 200, 0.2) !important;
+    }
+
+    .test-btn.active {
+      color: #ffffff !important;
+      background: #8e24aa !important;
+      border-color: #e1bee7 !important;
+      box-shadow: 0 0 14px rgba(186, 104, 200, 0.5) !important;
+    }
+
+    /* =================================================
+       SPARK AI OPERATING INTERFACE
+       Zone 1: Top-Left Branding
+       Zone 2: Left-Side Live Activity / Workspace
+       Zone 3: Right-Side Conversation Panel
+       Zone 4: Center 3D Core (Unobstructed Framing)
+       ================================================= */
+    
+    /* 1. TOP-LEFT SPARK BRANDING */
+    .spark-brand {
+      position: fixed;
+      top: 24px;
+      left: clamp(20px, 3.2vw, 44px);
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      pointer-events: auto;
+      user-select: none;
+    }
+
+    .spark-brand-title {
+      font-family: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+      font-size: clamp(16px, 1.35vw, 19px);
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+      transition: color 240ms ease, letter-spacing 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .spark-brand:hover .spark-brand-title {
+      color: #f3e5f5;
+      letter-spacing: 0.32em;
+    }
+
+    .spark-brand-version {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Grotesk', monospace, sans-serif;
+      font-size: 8.5px;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      color: rgba(255, 255, 255, 0.42);
+      transition: color 240ms ease;
+    }
+
+    .spark-brand:hover .spark-brand-version {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .spark-status-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ba68c8;
+      box-shadow: 0 0 8px rgba(186, 104, 200, 0.9);
+      animation: pulseBrandDot 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseBrandDot {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* 2. ZONE: LEFT-SIDE LIVE ACTIVITY / WORKSPACE */
+    .spark-workspace-panel {
+      position: fixed;
+      top: 68px;
+      bottom: 26px;
+      left: clamp(20px, 3.2vw, 44px);
+      width: clamp(310px, 24vw, 360px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      background: rgba(10, 5, 18, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.75), 0 0 1px rgba(255, 255, 255, 0.1);
+      pointer-events: auto;
+      overflow: hidden;
+      transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms ease;
+    }
+
+    .workspace-header {
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .workspace-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .workspace-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .workspace-tag {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    .workspace-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(186, 104, 200, 0.14);
+      border: 1px solid rgba(186, 104, 200, 0.35);
+      font-family: monospace;
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: #e1bee7;
+    }
+
+    .live-indicator-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #ba68c8;
+      box-shadow: 0 0 6px #ba68c8;
+      animation: pulseDot 1.8s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 0.5; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.25); }
+    }
+
+    .workspace-task-count {
+      font-family: monospace;
+      font-size: 8.5px;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* Task Type Tabs */
+    .workspace-task-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .workspace-task-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .task-tab-btn {
+      padding: 4px 9px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: rgba(255, 255, 255, 0.45);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 8.5px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      outline: none;
+      white-space: nowrap;
+      transition: all 180ms ease;
+    }
+
+    .task-tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .task-tab-btn.active {
+      color: #ffffff;
+      background: rgba(186, 104, 200, 0.2);
+      border-color: rgba(186, 104, 200, 0.5);
+      box-shadow: 0 0 10px rgba(186, 104, 200, 0.25);
+    }
+
+    /* Scrollable Workspace Body */
+    .workspace-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(186, 104, 200, 0.25) transparent;
+    }
+
+    .workspace-scroll-area::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .workspace-scroll-area::-webkit-scrollbar-thumb {
+      background: rgba(186, 104, 200, 0.25);
+      border-radius: 4px;
+    }
+
+    /* Active Task Section */
+    .task-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .task-section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+    }
+
+    .task-section-meta {
+      font-family: monospace;
+      font-size: 8.5px;
+      color: rgba(186, 104, 200, 0.85);
+      letter-spacing: 0.08em;
+    }
+
+    /* Live Progress Steps */
+    .task-steps-timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .task-steps-timeline::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 6px;
+      bottom: 6px;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .step-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .step-bullet {
+      position: absolute;
+      left: -14px;
+      top: 4px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 220ms ease;
+    }
+
+    .step-item.done .step-bullet {
+      background: #8e24aa;
+      border-color: #ba68c8;
+      box-shadow: 0 0 6px rgba(186, 104, 200, 0.6);
+    }
+
+    .step-item.active .step-bullet {
+      background: #ba68c8;
+      border-color: #f3e5f5;
+      box-shadow: 0 0 10px rgba(186, 104, 200, 0.9);
+      animation: pulseBullet 1.5s infinite;
+    }
+
+    @keyframes pulseBullet {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.35); opacity: 1; }
+    }
+
+    .step-text {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.68);
+      line-height: 1.4;
+    }
+
+    .step-item.done .step-text {
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .step-item.active .step-text {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .step-subtext {
+      font-family: monospace;
+      font-size: 8px;
+      color: rgba(255, 255, 255, 0.32);
+      letter-spacing: 0.05em;
+    }
+
+    .step-item.active .step-subtext {
+      color: #ba68c8;
+    }
+
+    .step-item.error .step-bullet {
+      background: #ef5350;
+      border-color: #ffcdd2;
+      box-shadow: 0 0 8px rgba(239, 83, 80, 0.8);
+    }
+
+    .step-item.error .step-text {
+      color: #ef5350;
+    }
+
+    .step-item.error .step-subtext {
+      color: #e57373;
+    }
+
+    .conv-status-pulse.offline {
+      background: #ef5350 !important;
+      box-shadow: 0 0 6px #ef5350 !important;
+    }
+
+    .conv-status-pulse.connecting {
+      background: #ffb74d !important;
+      box-shadow: 0 0 6px #ffb74d !important;
+    }
+
+    .live-indicator-dot.offline {
+      background: #ef5350 !important;
+      box-shadow: 0 0 6px #ef5350 !important;
+    }
+
+    /* Structured Results */
+    .workspace-results-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .results-card {
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: all 200ms ease;
+      cursor: default;
+    }
+
+    .results-card:hover {
+      background: rgba(255, 255, 255, 0.045);
+      border-color: rgba(186, 104, 200, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .results-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .results-card-sender {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #ffffff;
+      letter-spacing: 0.03em;
+    }
+
+    .results-card-num {
+      font-family: monospace;
+      font-size: 8px;
+      color: #ba68c8;
+      background: rgba(186, 104, 200, 0.15);
+      padding: 1px 4px;
+      border-radius: 4px;
+    }
+
+    .results-card-time {
+      font-family: monospace;
+      font-size: 8px;
+      color: rgba(255, 255, 255, 0.35);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .results-card-subject {
+      font-family: 'Inter', sans-serif;
+      font-size: 10.5px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.35;
+    }
+
+    .results-card-snippet {
+      font-family: 'Inter', sans-serif;
+      font-size: 9.5px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.45);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .results-card-badges {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 3px;
+    }
+
+    .results-badge {
+      font-family: monospace;
+      font-size: 7.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .results-badge.priority {
+      background: rgba(186, 104, 200, 0.2);
+      color: #e1bee7;
+      border: 1px solid rgba(186, 104, 200, 0.35);
+    }
+
+    /* 3. ZONE: RIGHT-SIDE CONVERSATION PANEL */
+    .spark-conversation-panel {
+      position: fixed;
+      top: 68px;
+      bottom: 26px;
+      right: clamp(20px, 3.2vw, 44px);
+      width: clamp(320px, 24vw, 375px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      background: rgba(10, 5, 18, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, 0.75), 0 0 1px rgba(255, 255, 255, 0.1);
+      pointer-events: auto;
+      overflow: hidden;
+      transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1), opacity 320ms ease;
+    }
+
+    .conv-panel-header {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .conv-panel-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .conv-panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    .conv-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: monospace;
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    .conv-status-pulse {
+      width: 4.5px;
+      height: 4.5px;
+      border-radius: 50%;
+      background: #ba68c8;
+      box-shadow: 0 0 6px #ba68c8;
+      animation: convPulse 2.4s infinite;
+    }
+
+    @keyframes convPulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.25); }
+    }
+
+    .conv-mode-tag {
+      font-family: monospace;
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(186, 104, 200, 0.12);
+      border: 1px solid rgba(186, 104, 200, 0.28);
+      color: #ba68c8;
+      transition: all 200ms ease;
+    }
+
+    /* Scrollable Conversation Stream */
+    .conv-messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(186, 104, 200, 0.25) transparent;
+    }
+
+    .conv-messages-container::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .conv-messages-container::-webkit-scrollbar-thumb {
+      background: rgba(186, 104, 200, 0.25);
+      border-radius: 4px;
+    }
+
+    /* Message Rows */
+    .message-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-width: 96%;
+      animation: msgFadeIn 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes msgFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-block.user-block {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .message-block.spark-block {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .message-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Grotesk', monospace, sans-serif;
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      padding: 0 4px;
+    }
+
+    .message-block.spark-block .message-meta {
+      color: #ba68c8;
+    }
+
+    .spark-avatar-icon {
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .message-bubble {
+      padding: 10px 13px;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11.5px;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      word-break: break-word;
+    }
+
+    .user-block .message-bubble {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      border-bottom-right-radius: 3px;
+    }
+
+    .spark-block .message-bubble {
+      background: rgba(186, 104, 200, 0.08);
+      border: 1px solid rgba(186, 104, 200, 0.22);
+      color: rgba(255, 255, 255, 0.92);
+      border-bottom-left-radius: 3px;
+    }
+
+    .spark-block .message-bubble strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    /* Bottom Input Form */
+    .conv-input-wrapper {
+      padding: 12px 14px 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.015);
+      flex-shrink: 0;
+    }
+
+    .conv-input-form {
+      display: flex;
+      align-items: center;
+      background: rgba(14, 7, 22, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      padding: 5px 6px 5px 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+      transition: all 200ms ease;
+    }
+
+    .conv-input-form:focus-within {
+      border-color: rgba(186, 104, 200, 0.45);
+      background: rgba(18, 9, 28, 0.95);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 16px rgba(186, 104, 200, 0.2);
+    }
+
+    .conv-mic-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      transition: all 180ms ease;
+      flex-shrink: 0;
+    }
+
+    .conv-mic-btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .conv-mic-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      transform: scale(1.05);
+    }
+
+    .conv-mic-btn.recording {
+      color: #ba68c8;
+      background: rgba(186, 104, 200, 0.25);
+      animation: voicePulseRecord 1.2s infinite;
+    }
+
+    @keyframes voicePulseRecord {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(186, 104, 200, 0.5); }
+      50% { box-shadow: 0 0 0 5px rgba(186, 104, 200, 0); }
+    }
+
+    .conv-text-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      padding: 0 8px;
+      min-width: 0;
+    }
+
+    .conv-text-input::placeholder {
+      color: rgba(255, 255, 255, 0.32);
+      font-size: 11px;
+    }
+
+    .conv-execute-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      outline: none;
+      transition: all 180ms ease;
+      flex-shrink: 0;
+    }
+
+    .conv-execute-btn svg {
+      width: 12px;
+      height: 12px;
+      transform: translateX(0.5px);
+      transition: transform 180ms ease;
+    }
+
+    .conv-execute-btn:hover {
+      color: #ffffff;
+      background: #8e24aa;
+      border-color: #ba68c8;
+      box-shadow: 0 0 12px rgba(186, 104, 200, 0.5);
+    }
+
+    .conv-execute-btn:hover svg {
+      transform: translateX(2px);
+    }
+
+    /* Mobile Zone Switcher */
+    .mobile-zone-nav {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 70;
+      background: rgba(14, 7, 22, 0.88);
+      border: 1px solid rgba(186, 104, 200, 0.35);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 4px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 6px 22px rgba(0, 0, 0, 0.8);
+    }
+
+    .mobile-zone-btn {
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      cursor: pointer;
+      transition: all 180ms ease;
+    }
+
+    .mobile-zone-btn.active {
+      color: #ffffff;
+      background: #8e24aa;
+      box-shadow: 0 0 10px rgba(186, 104, 200, 0.5);
+    }
+
+    /* RESPONSIVE LAYOUT */
+    @media (max-width: 1180px) {
+      .spark-workspace-panel {
+        width: 285px;
+        left: 18px;
+      }
+      .spark-conversation-panel {
+        width: 295px;
+        right: 18px;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .mobile-zone-nav {
+        display: flex;
+      }
+      .spark-workspace-panel {
+        top: 68px;
+        bottom: 84px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(400px, 92vw);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .spark-workspace-panel.active-mobile-view {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .spark-conversation-panel {
+        top: 68px;
+        bottom: 84px;
+        left: 50%;
+        transform: translateX(-50%);
+        right: auto;
+        width: min(400px, 92vw);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .spark-conversation-panel.active-mobile-view {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 1. SPARK Top-Left Identity -->
+  <header class="spark-brand" aria-label="Spark Identity">
+    <div class="spark-brand-title">SPARK</div>
+    <div class="spark-brand-version">
+      <span class="spark-status-dot"></span>
+      <span>V1.0</span>
+    </div>
+  </header>
+
+  <!-- Mobile View Switcher (<= 980px) -->
+  <nav class="mobile-zone-nav" id="mobileZoneNav" aria-label="Mobile Navigation">
+    <button type="button" class="mobile-zone-btn" data-view="workspace">WORKSPACE</button>
+    <button type="button" class="mobile-zone-btn active" data-view="reactor">CORE 3D</button>
+    <button type="button" class="mobile-zone-btn" data-view="conversation">CHAT</button>
+  </nav>
+
+  <!-- 2. LEFT SIDE — LIVE ACTIVITY / WORKSPACE -->
+  <aside class="spark-workspace-panel" id="sparkWorkspace" aria-label="Live Activity Workspace">
+    <div class="workspace-header">
+      <div class="workspace-header-top">
+        <div class="workspace-title-wrap">
+          <span class="workspace-tag">WORKSPACE</span>
+          <span class="workspace-live-badge">
+            <span class="live-indicator-dot"></span>
+            LIVE
+          </span>
+        </div>
+        <span class="workspace-task-count" id="taskCountLabel">1 TASK RUNNING</span>
+      </div>
+
+      <!-- Category / Task Types -->
+      <div class="workspace-task-tabs" id="workspaceTaskTabs" role="tablist">
+        <button type="button" class="task-tab-btn active" data-type="EMAIL">EMAIL</button>
+        <button type="button" class="task-tab-btn" data-type="TERMINAL">TERMINAL</button>
+        <button type="button" class="task-tab-btn" data-type="BROWSER">BROWSER</button>
+        <button type="button" class="task-tab-btn" data-type="FILES">FILES</button>
+        <button type="button" class="task-tab-btn" data-type="SEARCH">SEARCH</button>
+      </div>
+    </div>
+
+    <div class="workspace-scroll-area" id="workspaceScrollArea">
+      <!-- Populated dynamically via ActivityWorkspace JS -->
+    </div>
+  </aside>
+
+  <!-- 3. RIGHT SIDE — REAL CONVERSATION PANEL -->
+  <aside class="spark-conversation-panel" id="sparkConversation" aria-label="Conversation Panel">
+    <div class="conv-panel-header">
+      <div class="conv-panel-title-wrap">
+        <span class="conv-panel-title">CONVERSATION</span>
+        <span class="conv-status-badge">
+          <span class="conv-status-pulse"></span>
+          ONLINE
+        </span>
+      </div>
+      <span class="conv-mode-tag" id="sparkModeBadge">NORMAL</span>
+    </div>
+
+    <div class="conv-messages-container" id="convMessagesContainer">
+      <!-- Demo conversation sequence matching prompt -->
+      <div class="message-block user-block">
+        <div class="message-meta">
+          <span>YOU</span>
+          <span>22:04</span>
+        </div>
+        <div class="message-bubble">
+          Open my mail and show me the most important unread emails.
+        </div>
+      </div>
+
+      <div class="message-block spark-block">
+        <div class="message-meta">
+          <span class="spark-avatar-icon">✦</span>
+          <span>SPARK</span>
+          <span>22:04</span>
+        </div>
+        <div class="message-bubble">
+          Checking your inbox...
+        </div>
+      </div>
+
+      <div class="message-block spark-block">
+        <div class="message-meta">
+          <span class="spark-avatar-icon">✦</span>
+          <span>SPARK</span>
+          <span>22:04</span>
+        </div>
+        <div class="message-bubble">
+          Found 7 unread messages marked as important.
+        </div>
+      </div>
+
+      <div class="message-block spark-block">
+        <div class="message-meta">
+          <span class="spark-avatar-icon">✦</span>
+          <span>SPARK</span>
+          <span>22:04</span>
+        </div>
+        <div class="message-bubble">
+          I've identified the messages that need attention. Surfaced the top priority items in your live workspace.
+        </div>
+      </div>
+    </div>
+
+    <div class="conv-input-wrapper">
+      <form class="conv-input-form" id="conversationForm" onsubmit="event.preventDefault();">
+        <button type="button" class="conv-mic-btn" id="voiceButton" aria-label="Voice Input">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="22"></line>
+          </svg>
+        </button>
+        <input
+          type="text"
+          class="conv-text-input"
+          id="conversationInput"
+          placeholder="Ask Spark anything..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button type="submit" class="conv-execute-btn" id="sendButton" aria-label="Execute prompt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="site">
+    <section class="hero" id="hero">
+      <video
+        id="heroVideo"
+        class="hero-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        crossorigin="anonymous"
+      >
+        <source src="./particles.mp4" type="video/mp4" />
+        <source
+          src="https://videos.pexels.com/video-files/34637934/14681026_1920_1080_30fps.mp4"
+          type="video/mp4"
+        />
+
+        Your browser does not support background video.
+      </video>
+
+      <canvas id="particleCanvas" class="hero-video"></canvas>
+
+      <div class="video-overlay"></div>
+      <div class="hero-vignette"></div>
+      <div class="grain"></div>
+    </section>
+  </main>
+
+  <!-- Temporary Testing Controls (Direct Child of Body, High Visibility) -->
+  <div
+    class="test-controls"
+    id="testControls"
+    role="toolbar"
+    aria-label="Testing Controls"
+    style="position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; background: rgba(14, 6, 22, 0.92); border: 1px solid rgba(186, 104, 200, 0.45); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 8px 30px rgba(0,0,0,0.85), 0 0 15px rgba(156, 39, 176, 0.25); pointer-events: auto;"
+  >
+    <button class="test-btn active" data-mode="NORMAL" type="button" style="cursor: pointer; pointer-events: auto;">NORMAL</button>
+    <button class="test-btn" data-mode="LISTENING" type="button" style="cursor: pointer; pointer-events: auto;">LISTENING</button>
+    <button class="test-btn" data-mode="THINKING" type="button" style="cursor: pointer; pointer-events: auto;">THINKING</button>
+    <button class="test-btn" data-mode="SPEAKING" type="button" style="cursor: pointer; pointer-events: auto;">SPEAKING</button>
+  </div>
+
+  <script>
+    (function () {
+      const video = document.getElementById("heroVideo");
+      const canvas = document.getElementById("particleCanvas");
+      const hero = document.getElementById("hero");
+      const testButtons = document.querySelectorAll(".test-btn");
+
+      if (!video || !canvas) return;
+
+      const gl =
+        canvas.getContext("webgl", { alpha: false, antialias: true }) ||
+        canvas.getContext("experimental-webgl");
+
+      if (!gl) {
+        return;
+      }
+
+      // Vertex shader
+      const vsSource = `
+        attribute vec2 a_position;
+        varying vec2 v_uv;
+        void main() {
+          v_uv = (a_position + 1.0) * 0.5;
+          gl_Position = vec4(a_position, 0.0, 1.0);
+        }
+      `;
+
+      // Fragment shader: reduced bloom, sharp dots, audio displacement, thinking streams, controlled glow
+      const fsSource = `
+        precision highp float;
+        uniform sampler2D u_video;
+        uniform vec2 u_resolution;
+        uniform vec2 u_mouse;
+        uniform float u_hover;
+        uniform float u_videoAspect;
+        uniform float u_scale;
+        uniform float u_swirl;
+        uniform float u_audioDisp;
+        uniform float u_time;
+        varying vec2 v_uv;
+
+        void main() {
+          float screenAspect = u_resolution.x / u_resolution.y;
+          vec2 screenPos = v_uv;
+
+          // 1. Mouse hover displacement in aspect-corrected screen UV
+          vec2 diff = screenPos - u_mouse;
+          diff.x *= screenAspect;
+          float dist = length(diff);
+
+          float radius = 0.22;
+          vec2 interactPos = screenPos;
+
+          if (dist < radius && u_hover > 0.0005) {
+            float t = dist / radius;
+            float factor = sin(t * 3.14159265) * (1.0 - smoothstep(0.0, 1.0, t));
+            float repelStrength = 0.032 * u_hover;
+            vec2 dir = normalize(diff);
+            dir.x /= screenAspect;
+
+            interactPos += dir * (factor * repelStrength);
+          }
+
+          // 2. Base Scale with room for expansion
+          vec2 centered = (interactPos - vec2(0.5)) / u_scale;
+
+          // 3. Audio & Voice Reactivity in LISTENING / SPEAKING
+          if (u_audioDisp > 0.001) {
+            vec2 aspectCentered = centered;
+            aspectCentered.x *= screenAspect;
+            float r = length(aspectCentered);
+            float angle = atan(aspectCentered.y, aspectCentered.x);
+
+            // Responsive organic radial audio wave & dynamic orbital breath
+            float wave = sin(r * 12.0 - u_time * 6.5 + angle * 2.0) * (0.026 * u_audioDisp);
+            float audioSwirl = cos(angle * 3.0 - u_time * 4.8) * (0.020 * u_audioDisp);
+
+            r += wave;
+            angle += audioSwirl;
+
+            aspectCentered = vec2(cos(angle), sin(angle)) * r;
+            aspectCentered.x /= screenAspect;
+            centered = aspectCentered;
+          }
+
+          // 4. Thinking Mode: active internal processing streams & orbital displacement (optimized for 60 FPS)
+          if (u_swirl > 0.001) {
+            vec2 aspectCentered = centered;
+            aspectCentered.x *= screenAspect;
+            float r = length(aspectCentered);
+
+            // Fast boundary check: skips transcendentals for ~80% of background pixels
+            if (r > 0.03 && r < 0.52) {
+              // Singularity-free smooth band mask focused on particle reactor & ring
+              float innerSmooth = smoothstep(0.03, 0.12, r);
+              float outerSmooth = smoothstep(0.52, 0.36, r);
+              float bandMask = innerSmooth * outerSmooth * u_swirl;
+
+              vec2 dir = aspectCentered / r;
+              float angle = atan(dir.y, dir.x);
+
+              // Directional orbital stream flow along circumference
+              float orbitalFlow = sin(angle * 3.0 - u_time * 5.2 + r * 11.0) * (0.022 * bandMask);
+              
+              // Radial processing displacement wave around core
+              float radialFlow = cos(r * 16.0 - u_time * 6.0 + angle * 2.0) * (0.014 * bandMask);
+
+              // Apply tangential flow (-sin, cos) and radial flow (cos, sin) using normalized dir
+              aspectCentered.x += (-dir.y) * orbitalFlow + dir.x * radialFlow;
+              aspectCentered.y += dir.x * orbitalFlow + dir.y * radialFlow;
+
+              aspectCentered.x /= screenAspect;
+              centered = aspectCentered;
+            }
+          }
+
+          vec2 scaledUV = centered + vec2(0.5);
+
+          // 5. Video Cover Aspect Mapping
+          vec2 videoUV = scaledUV;
+          if (screenAspect > u_videoAspect) {
+            float scale = u_videoAspect / screenAspect;
+            videoUV.y = 0.5 + (videoUV.y - 0.5) * scale;
+          } else {
+            float scale = screenAspect / u_videoAspect;
+            videoUV.x = 0.5 + (videoUV.x - 0.5) * scale;
+          }
+
+          // Smooth edge falloff if outside scaled bounds
+          if (videoUV.x < 0.0 || videoUV.x > 1.0 || videoUV.y < 0.0 || videoUV.y > 1.0) {
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+            return;
+          }
+
+          float edgeDistX = min(videoUV.x, 1.0 - videoUV.x);
+          float edgeDistY = min(videoUV.y, 1.0 - videoUV.y);
+          float edgeFactor = smoothstep(0.0, 0.035, min(edgeDistX, edgeDistY));
+
+          vec4 raw = texture2D(u_video, clamp(videoUV, vec2(0.001), vec2(0.999)));
+
+          // 6. SHADING & OCCLUSION REFINEMENT — LIFT DARK 3D GEOMETRY DURING ROTATION
+          vec2 geomPos = centered;
+          geomPos.x *= screenAspect;
+          float rGeom = length(geomPos);
+          float objectMask = smoothstep(0.44, 0.34, rGeom);
+
+          float lum = dot(raw.rgb, vec3(0.299, 0.587, 0.114));
+          // Subtly lift shadowed 3D particle geometry (beads/occlusion) without affecting glowing particles or dark background
+          float shadowFactor = smoothstep(0.04, 0.08, lum) * smoothstep(0.38, 0.18, lum);
+          vec3 ambientColor = raw.rgb / (lum + 0.02);
+          vec3 liftedRaw = raw.rgb + ambientColor * (0.09 * shadowFactor * objectMask);
+
+          // Clean black floor cut: keeps background inky black while maintaining visibility of 3D geometry
+          vec3 rgb = max(vec3(0.0), (liftedRaw - vec3(25.0 / 255.0)) * (255.0 / (235.0 - 25.0)));
+
+          // Gamma curve: maintains 3D depth and particle contrast
+          rgb = pow(rgb, vec3(1.26));
+
+          // EXACT original purple color balance restored from previous version
+          float gray = dot(rgb, vec3(0.299, 0.587, 0.114));
+          rgb = mix(vec3(gray), rgb, 1.15);
+
+          // Atmospheric aura retention (preserves black artifact fix)
+          rgb = rgb * edgeFactor;
+
+          gl_FragColor = vec4(rgb, raw.a);
+        }
+      `;
+
+      function createShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error(gl.getShaderInfoLog(shader));
+          gl.deleteShader(shader);
+          return null;
+        }
+        return shader;
+      }
+
+      const vertexShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
+      const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+      if (!vertexShader || !fragmentShader) return;
+
+      const program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+        return;
+      }
+
+      gl.useProgram(program);
+
+      // Full-screen quad
+      const positionBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+        gl.STATIC_DRAW
+      );
+
+      const aPosition = gl.getAttribLocation(program, "a_position");
+      gl.enableVertexAttribArray(aPosition);
+      gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+
+      // Texture setup with color space preservation
+      gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+      // Uniforms
+      const uResolution = gl.getUniformLocation(program, "u_resolution");
+      const uMouse = gl.getUniformLocation(program, "u_mouse");
+      const uHover = gl.getUniformLocation(program, "u_hover");
+      const uVideoAspect = gl.getUniformLocation(program, "u_videoAspect");
+      const uScale = gl.getUniformLocation(program, "u_scale");
+      const uSwirl = gl.getUniformLocation(program, "u_swirl");
+      const uAudioDisp = gl.getUniformLocation(program, "u_audioDisp");
+      const uTime = gl.getUniformLocation(program, "u_time");
+
+      let width = 0;
+      let height = 0;
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+
+      resize();
+      window.addEventListener("resize", resize);
+
+      // Mouse & Touch Tracking with Smooth Inertia
+      let targetX = 0.5;
+      let targetY = 0.5;
+      let currentX = 0.5;
+      let currentY = 0.5;
+      let targetHover = 0.0;
+      let currentHover = 0.0;
+
+      function updatePointer(clientX, clientY) {
+        targetX = clientX / window.innerWidth;
+        targetY = 1.0 - clientY / window.innerHeight; // Invert for WebGL UV coords
+        targetHover = 1.0;
+      }
+
+      window.addEventListener("mousemove", (e) => {
+        updatePointer(e.clientX, e.clientY);
+      });
+
+      window.addEventListener("mouseleave", () => {
+        targetHover = 0.0;
+      });
+
+      window.addEventListener(
+        "touchmove",
+        (e) => {
+          if (e.touches && e.touches.length > 0) {
+            updatePointer(e.touches[0].clientX, e.touches[0].clientY);
+          }
+        },
+        { passive: true }
+      );
+
+      window.addEventListener("touchend", () => {
+        targetHover = 0.0;
+      });
+
+      // Mode State Management (NORMAL, LISTENING, THINKING, SPEAKING)
+      let currentMode = "NORMAL";
+      let listeningPhase = 0;
+      let audioTimer = 0;
+      let simulatedAudioIntensity = 0.0;
+
+      // Speaking mode word-pulse simulation
+      let speechTimer = 0;
+      let nextSpeechWordTime = 0.35;
+      let speechPulseImpulse = 0.0;
+
+      function triggerSpeechPulse(intensity = 1.0) {
+        // Immediate physical expansion pulse for an utterance/word
+        speechPulseImpulse = 0.17 * intensity;
+      }
+
+      // Base scale: 0.72 provides comfortable margin around hero
+      const BASE_SCALE = 0.72;
+      let targetScale = BASE_SCALE;
+      let currentScale = BASE_SCALE;
+
+      let targetSwirl = 0.0;
+      let currentSwirl = 0.0;
+
+      let targetSpeed = 1.0;
+      let currentSpeed = 1.0;
+
+      let targetAudioDisp = 0.0;
+      let currentAudioDisp = 0.0;
+
+      function setSparkMode(mode) {
+        if (!mode) return;
+        currentMode = mode;
+        testButtons.forEach((b) => {
+          if (b.getAttribute("data-mode") === mode) {
+            b.classList.add("active");
+          } else {
+            b.classList.remove("active");
+          }
+        });
+        const badge = document.getElementById("sparkModeBadge");
+        if (badge) {
+          badge.textContent = mode;
+        }
+        if (mode === "SPEAKING") {
+          speechTimer = 0;
+          nextSpeechWordTime = 0.2; // triggers first word pulse quickly
+        }
+      }
+      window.setSparkMode = setSparkMode;
+      window.triggerSpeechPulse = triggerSpeechPulse;
+
+      testButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          setSparkMode(btn.getAttribute("data-mode"));
+        });
+      });
+
+      // Render Loop
+      let isCanvasReady = false;
+      let lastTime = performance.now();
+
+      function render(now) {
+        requestAnimationFrame(render);
+
+        const dt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+
+        // -------------------------------------------------------------
+        // State Target Calculations
+        // -------------------------------------------------------------
+        if (currentMode === "NORMAL") {
+          // Calm living baseline
+          targetScale = BASE_SCALE;
+          targetSwirl = 0.0;
+          targetSpeed = 1.0;
+          targetAudioDisp = 0.0;
+
+        } else if (currentMode === "LISTENING") {
+          // Voice-reactive AI listener: responsive rhythmic breathing driven by changing audioIntensity
+          audioTimer += dt;
+          const wave1 = Math.sin(audioTimer * 4.8) * 0.32;
+          const wave2 = Math.sin(audioTimer * 8.6 + 1.2) * 0.20;
+          const wave3 = Math.sin(audioTimer * 13.8 + 2.5) * 0.12;
+          simulatedAudioIntensity = Math.max(0.08, Math.min(1.0, 0.48 + wave1 + wave2 + wave3));
+
+          // Natural breathing rhythm with dynamic audio response (small -> BIG -> small -> BIG)
+          // Moderately faster breathing cadence: responsive ~1.3s cycle instead of slow >2.2s
+          listeningPhase += dt * (3.8 + simulatedAudioIntensity * 2.2);
+          const naturalBreath = Math.sin(listeningPhase) * (0.09 + simulatedAudioIntensity * 0.10);
+          targetScale = BASE_SCALE + naturalBreath + (simulatedAudioIntensity * 0.06);
+
+          targetAudioDisp = simulatedAudioIntensity;
+          targetSwirl = 0.0;
+          targetSpeed = 1.12 + simulatedAudioIntensity * 0.42;
+
+        } else if (currentMode === "THINKING") {
+          // Active cognitive processing: stable 3D scale, lightweight GPU orbital swirl streams, smooth 60 FPS flow
+          targetScale = BASE_SCALE;
+          targetSwirl = 1.0;
+          targetSpeed = 1.0;
+          targetAudioDisp = 0.0;
+
+        } else if (currentMode === "SPEAKING") {
+          // Word / utterance reactive: individual voice pulses with brief calm intervals
+          speechTimer += dt;
+          if (speechTimer >= nextSpeechWordTime) {
+            speechTimer = 0;
+            // Next word cadence: utterance pulse -> brief calm pause (0.42s to 0.78s)
+            nextSpeechWordTime = 0.52 + Math.random() * 0.38;
+            const wordStress = 0.85 + Math.random() * 0.35;
+            triggerSpeechPulse(wordStress);
+          }
+
+          // Smooth exponential decay of utterance pulse
+          speechPulseImpulse *= Math.exp(-dt * 7.2);
+
+          targetScale = BASE_SCALE + speechPulseImpulse;
+          targetAudioDisp = speechPulseImpulse * 3.4;
+          targetSpeed = 1.0 + (speechPulseImpulse / 0.17) * 0.32;
+          targetSwirl = 0.0;
+        }
+
+        // Smooth Exponential Transitions (zero jarring jumps between states)
+        const scaleLerp = currentMode === "LISTENING" ? 0.14 : 0.08;
+        const audioLerp = currentMode === "LISTENING" ? 0.14 : 0.08;
+        currentScale += (targetScale - currentScale) * scaleLerp;
+        currentSwirl += (targetSwirl - currentSwirl) * 0.08;
+        currentSpeed += (targetSpeed - currentSpeed) * 0.08;
+        currentAudioDisp += (targetAudioDisp - currentAudioDisp) * audioLerp;
+
+        // Smooth internal playback rate update (avoid continuous property mutation on every frame)
+        if (Math.abs(video.playbackRate - currentSpeed) > 0.02) {
+          video.playbackRate = currentSpeed;
+        }
+
+        // Smooth organic lerp to follow cursor
+        currentX += (targetX - currentX) * 0.085;
+        currentY += (targetY - currentY) * 0.085;
+        currentHover += (targetHover - currentHover) * 0.07;
+
+        if (video.readyState >= 2 && !video.paused) {
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.texImage2D(
+            gl.TEXTURE_2D,
+            0,
+            gl.RGBA,
+            gl.RGBA,
+            gl.UNSIGNED_BYTE,
+            video
+          );
+
+          gl.uniform2f(uResolution, canvas.width, canvas.height);
+          gl.uniform2f(uMouse, currentX, currentY);
+          gl.uniform1f(uHover, currentHover);
+          gl.uniform1f(uScale, currentScale);
+          gl.uniform1f(uSwirl, currentSwirl);
+          gl.uniform1f(uAudioDisp, currentAudioDisp);
+          gl.uniform1f(uTime, now * 0.001);
+
+          const videoAspect =
+            (video.videoWidth || 1920) / (video.videoHeight || 1080);
+          gl.uniform1f(uVideoAspect, videoAspect);
+
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+          if (!isCanvasReady) {
+            isCanvasReady = true;
+            video.style.opacity = "0";
+          }
+        }
+      }
+
+      render(performance.now());
+    })();
+
+    // ─────────────────────────────────────────────────────────────
+    // SPARK AI OPERATING INTERFACE ENGINE
+    // ─────────────────────────────────────────────────────────────
+    (function () {
+      // ─────────────────────────────────────────────────────────────
+      // SPARK LIVE BRIDGE & RUNTIME ENGINE (PHASE 4)
+      // ─────────────────────────────────────────────────────────────
+
+      const BRIDGE_WS_URL = "ws://localhost:8787";
+      const RECONNECT_DELAYS = [1000, 2000, 4000, 8000, 16000];
+
+      // UI References
+      const convContainer = document.getElementById("convMessagesContainer");
+      const convForm = document.getElementById("conversationForm");
+      const convInput = document.getElementById("conversationInput");
+      const voiceBtn = document.getElementById("voiceButton");
+      const sendBtn = document.getElementById("sendButton");
+      const scrollArea = document.getElementById("workspaceScrollArea");
+      const taskTabs = document.querySelectorAll(".task-tab-btn");
+      const taskCountLabel = document.getElementById("taskCountLabel");
+      const convStatusBadge = document.querySelector(".conv-status-badge");
+      const workspaceLiveBadge = document.querySelector(".workspace-live-badge");
+      const modeBadge = document.getElementById("sparkModeBadge");
+
+      // State Management
+      let socket = null;
+      let isConnected = false;
+      let reconnectAttempt = 0;
+      let reconnectTimer = null;
+      let currentTurnId = null;
+      let activeTab = "TERMINAL";
+      let activeTaskData = {
+        title: "SYSTEM",
+        protocol: "STANDBY // READY",
+        meta: "Bridge connected",
+        steps: [
+          { text: "Spark Neural Interface initialized", sub: "Bridge protocol ready on ws://localhost:8787", status: "done" }
+        ],
+        resultsTitle: "RECENT ACTIONS",
+        resultsMeta: "Ready for user commands",
+        items: []
+      };
+
+      // Active message rendering buffers
+      let activeSparkBubble = null;
+      let accumulatedText = "";
+      let renderPending = false;
+
+      // ─────────────────────────────────────────────────────────────
+      // 1. UTILITIES & FORMATTING
+      // ─────────────────────────────────────────────────────────────
+      function formatCurrentTime() {
+        const now = new Date();
+        return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return "";
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function prettyToolName(raw) {
+        if (!raw) return { name: "System Action", sub: "Internal operation", category: "TERMINAL" };
+        if (raw.startsWith("spark_windows__")) {
+          const t = raw.replace("spark_windows__", "");
+          if (t === "powershell") return { name: "PowerShell Command", sub: "Executing Windows shell command", category: "TERMINAL" };
+          if (t === "launch_app") return { name: "Launch Application", sub: "Opening native Windows app", category: "TERMINAL" };
+          if (t === "open_path") return { name: "Open File or Directory", sub: "Launching in Windows default handler", category: "FILES" };
+          return { name: `Windows ${t}`, sub: "Windows native system capability", category: "TERMINAL" };
+        }
+        if (raw.startsWith("mcp__")) {
+          const parts = raw.split("__");
+          const server = parts[1] || "mcp";
+          const tool = parts.slice(2).join(" ").replace(/_/g, " ") || "action";
+          let category = "FILES";
+          if (server.includes("browser") || server.includes("chrome") || server.includes("page")) category = "BROWSER";
+          else if (server.includes("search") || server.includes("serp") || server.includes("exa")) category = "SEARCH";
+          else if (server.includes("terminal") || server.includes("shell") || server.includes("system")) category = "TERMINAL";
+          return { name: `${server} · ${tool}`, sub: `MCP Protocol (${server})`, category };
+        }
+        // Built-ins
+        const builtins = {
+          Read: { name: "Read File", sub: "Reading workspace file content", category: "FILES" },
+          Write: { name: "Write File", sub: "Writing output to file system", category: "FILES" },
+          Edit: { name: "Edit File", sub: "Applying edits to workspace source", category: "FILES" },
+          MultiEdit: { name: "Batch Edit", sub: "Applying multi-file edits", category: "FILES" },
+          Glob: { name: "Scan Directory", sub: "Traversing workspace directories", category: "FILES" },
+          Grep: { name: "Search Codebase", sub: "Pattern searching within workspace", category: "SEARCH" },
+          WebSearch: { name: "Web Search", sub: "Retrieving relevant online knowledge", category: "SEARCH" },
+          WebFetch: { name: "Fetch Web Page", sub: "Reading external documentation", category: "BROWSER" },
+          Task: { name: "Subagent Task", sub: "Delegating autonomous sub-routine", category: "TERMINAL" },
+          Agent: { name: "Agent Sub-routine", sub: "Executing agentic cycle", category: "TERMINAL" },
+          Bash: { name: "Terminal Execution", sub: "Running shell environment process", category: "TERMINAL" }
+        };
+        if (builtins[raw]) return builtins[raw];
+        return { name: raw, sub: "Agent operation in progress", category: "TERMINAL" };
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 2. CONVERSATION UI STREAMING & TURNS
+      // ─────────────────────────────────────────────────────────────
+      function appendUserMessage(text) {
+        if (!convContainer) return;
+        const time = formatCurrentTime();
+        const block = document.createElement("div");
+        block.className = "message-block user-block";
+        block.innerHTML = `
+          <div class="message-meta">
+            <span>YOU</span>
+            <span>${time}</span>
+          </div>
+          <div class="message-bubble">${escapeHtml(text)}</div>
+        `;
+        convContainer.appendChild(block);
+        convContainer.scrollTop = convContainer.scrollHeight;
+      }
+
+      function createSparkStreamingBubble() {
+        if (!convContainer) return;
+        const time = formatCurrentTime();
+        const block = document.createElement("div");
+        block.className = "message-block spark-block";
+        block.innerHTML = `
+          <div class="message-meta">
+            <span class="spark-avatar-icon">✦</span>
+            <span>SPARK</span>
+            <span>${time}</span>
+          </div>
+          <div class="message-bubble"><span class="streaming-dot" style="opacity: 0.6;">Thinking...</span></div>
+        `;
+        convContainer.appendChild(block);
+        convContainer.scrollTop = convContainer.scrollHeight;
+        activeSparkBubble = block.querySelector(".message-bubble");
+        accumulatedText = "";
+      }
+
+      function scheduleStreamRender() {
+        if (renderPending) return;
+        renderPending = true;
+        requestAnimationFrame(() => {
+          renderPending = false;
+          if (!activeSparkBubble) return;
+          // Filter out accidental accessibility tag dumps (e.g. svgsvg canvas)
+          const cleanedText = accumulatedText.replace(/\b(?:svg\s*)+canvas\b/gi, '').trim();
+          if (cleanedText.length > 0) {
+            // Render text with line breaks preserved
+            activeSparkBubble.innerHTML = escapeHtml(cleanedText).replace(/\n/g, "<br>");
+          }
+          if (convContainer) {
+            convContainer.scrollTop = convContainer.scrollHeight;
+          }
+        });
+      }
+
+      function appendSystemNotice(text, isError = false) {
+        if (!convContainer) return;
+        const time = formatCurrentTime();
+        const block = document.createElement("div");
+        block.className = "message-block spark-block";
+        block.innerHTML = `
+          <div class="message-meta">
+            <span class="spark-avatar-icon" style="color: ${isError ? "#ef5350" : "#ba68c8"};">✦</span>
+            <span style="color: ${isError ? "#ef5350" : "#e1bee7"};">${isError ? "SYSTEM ERROR" : "SPARK"}</span>
+            <span>${time}</span>
+          </div>
+          <div class="message-bubble" style="${isError ? "border-color: rgba(239,83,80,0.4); background: rgba(239,83,80,0.08);" : ""}">
+            ${escapeHtml(text)}
+          </div>
+        `;
+        convContainer.appendChild(block);
+        convContainer.scrollTop = convContainer.scrollHeight;
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 3. WORKSPACE & TOOL TIMELINE RENDERING
+      // ─────────────────────────────────────────────────────────────
+      function renderWorkspace() {
+        if (!scrollArea) return;
+
+        let stepsHTML = activeTaskData.steps
+          .map(
+            (step) => `
+          <div class="step-item ${step.status}">
+            <span class="step-bullet"></span>
+            <div class="step-text">${escapeHtml(step.text)}</div>
+            <div class="step-subtext">${escapeHtml(step.sub)}</div>
+          </div>
+        `
+          )
+          .join("");
+
+        let itemsHTML = activeTaskData.items.length
+          ? activeTaskData.items
+              .map(
+                (item) => `
+            <article class="results-card">
+              <div class="results-card-top">
+                <div class="results-card-sender">
+                  <span class="results-card-num">${escapeHtml(item.num)}</span>
+                  <span>${escapeHtml(item.sender)}</span>
+                </div>
+                <span class="results-card-time">${escapeHtml(item.time)}</span>
+              </div>
+              <h4 class="results-card-subject">${escapeHtml(item.subject)}</h4>
+              <p class="results-card-snippet">${escapeHtml(item.snippet)}</p>
+              <div class="results-card-badges">
+                <span class="results-badge ${item.isPriority ? "priority" : ""}">${escapeHtml(item.tag)}</span>
+              </div>
+            </article>
+          `
+              )
+              .join("")
+          : `
+            <div style="font-family: 'Inter', sans-serif; font-size: 9.5px; color: rgba(255,255,255,0.3); padding: 12px 0;">
+              No structured artifacts yet. Tool executions and data panels will appear here.
+            </div>
+          `;
+
+        scrollArea.innerHTML = `
+          <!-- Active Task Section -->
+          <section class="task-active-section">
+            <div class="task-section-header">
+              <span class="task-section-title">${escapeHtml(activeTaskData.title)} // ${escapeHtml(activeTaskData.protocol)}</span>
+              <span class="task-section-meta">${escapeHtml(activeTaskData.meta)}</span>
+            </div>
+            <div class="task-steps-timeline">
+              ${stepsHTML}
+            </div>
+          </section>
+
+          <!-- Structured Results Section -->
+          <section class="workspace-results-block">
+            <div class="task-section-header">
+              <span class="task-section-title">${escapeHtml(activeTaskData.resultsTitle)}</span>
+              <span class="task-section-meta">${escapeHtml(activeTaskData.resultsMeta)}</span>
+            </div>
+            ${itemsHTML}
+          </section>
+        `;
+      }
+
+      function switchWorkspaceTab(category) {
+        if (!category) return;
+        activeTab = category;
+        taskTabs.forEach((tab) => {
+          if (tab.getAttribute("data-type") === category) {
+            tab.classList.add("active");
+          } else {
+            tab.classList.remove("active");
+          }
+        });
+      }
+
+      function addWorkspaceStep(text, sub, status = "active") {
+        // Mark previous active steps as done
+        activeTaskData.steps.forEach((s) => {
+          if (s.status === "active") s.status = "done";
+        });
+        activeTaskData.steps.push({ text, sub, status });
+        renderWorkspace();
+      }
+
+      function completeWorkspaceTask(summary = "Task completed successfully") {
+        activeTaskData.steps.forEach((s) => {
+          if (s.status === "active") s.status = "done";
+        });
+        activeTaskData.meta = "Finished • " + formatCurrentTime();
+        if (taskCountLabel) taskCountLabel.textContent = "IDLE";
+        renderWorkspace();
+      }
+
+      function failWorkspaceTask(errorMessage) {
+        activeTaskData.steps.forEach((s) => {
+          if (s.status === "active") s.status = "done";
+        });
+        activeTaskData.steps.push({
+          text: "Execution halted",
+          sub: errorMessage || "Operation failed",
+          status: "error"
+        });
+        activeTaskData.meta = "Error • " + formatCurrentTime();
+        if (taskCountLabel) taskCountLabel.textContent = "ERROR";
+        renderWorkspace();
+      }
+
+      function addWorkspaceResultItem(sender, subject, snippet, tag = "Output", isPriority = false) {
+        const num = String(activeTaskData.items.length + 1).padStart(2, "0");
+        activeTaskData.items.unshift({
+          num,
+          sender,
+          time: formatCurrentTime(),
+          subject,
+          snippet,
+          tag,
+          isPriority
+        });
+        activeTaskData.resultsMeta = `${activeTaskData.items.length} items surfaced`;
+        renderWorkspace();
+      }
+
+      // Initialize default workspace view
+      renderWorkspace();
+
+      // Tab switcher clicks
+      taskTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const type = tab.getAttribute("data-type");
+          if (!type || type === activeTab) return;
+          switchWorkspaceTab(type);
+        });
+      });
+
+      // ─────────────────────────────────────────────────────────────
+      // 4. TTS (SPEECH SYNTHESIS) ENGINE
+      // ─────────────────────────────────────────────────────────────
+      let speechQueue = [];
+      let isSpeaking = false;
+      let pendingSpeechSentence = "";
+
+      function feedTtsDelta(delta) {
+        if (!window.speechSynthesis) return;
+        pendingSpeechSentence += delta;
+        // Split on sentence boundaries
+        const match = pendingSpeechSentence.match(/([^\.!\?\n]+[\.!\?\n]+)/);
+        if (match) {
+          const sentence = match[1].trim();
+          pendingSpeechSentence = pendingSpeechSentence.slice(match[1].length);
+          if (sentence.length > 1) {
+            enqueueTts(sentence);
+          }
+        }
+      }
+
+      function flushTts() {
+        if (pendingSpeechSentence.trim().length > 1) {
+          enqueueTts(pendingSpeechSentence.trim());
+          pendingSpeechSentence = "";
+        }
+      }
+
+      function enqueueTts(text) {
+        if (!window.speechSynthesis) return;
+        // Filter out markdown formatting
+        const clean = text
+          .replace(/[*_#`~]/g, "")
+          .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
+          .trim();
+        if (!clean) return;
+
+        speechQueue.push(clean);
+        pumpTts();
+      }
+
+      function getSweetFemaleVoice() {
+        if (!window.speechSynthesis) return null;
+        const voices = window.speechSynthesis.getVoices();
+        if (!voices || voices.length === 0) return null;
+
+        // Preferred sweet natural female voices (ordered by quality and pleasantness)
+        const preferred = [
+          /Microsoft Jenny/i,
+          /Microsoft Aria/i,
+          /Google US English/i,
+          /Natural.*Female/i,
+          /Microsoft Zira/i,
+          /Samantha/i,
+          /Victoria/i,
+          /Karen/i,
+          /en[-_]US.*Female/i,
+        ];
+
+        for (const pattern of preferred) {
+          const match = voices.find((v) => pattern.test(v.name) && v.lang.startsWith("en"));
+          if (match) return match;
+        }
+
+        const femaleFallback = voices.find((v) => /female|zira|jenny|aria|samantha/i.test(v.name));
+        if (femaleFallback) return femaleFallback;
+
+        return voices.find((v) => v.lang.startsWith("en")) || voices[0];
+      }
+
+      if (typeof window !== "undefined" && window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          getSweetFemaleVoice();
+        };
+      }
+
+      function pumpTts() {
+        if (isSpeaking || speechQueue.length === 0 || !window.speechSynthesis) return;
+        const textToSpeak = speechQueue.shift();
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        const femaleVoice = getSweetFemaleVoice();
+        if (femaleVoice) {
+          utterance.voice = femaleVoice;
+        }
+        utterance.rate = 1.02;
+        utterance.pitch = 1.08; // slightly higher pitch for a bright, sweet tone
+
+        utterance.onstart = () => {
+          isSpeaking = true;
+          if (typeof window.setSparkMode === "function") {
+            window.setSparkMode("SPEAKING");
+          }
+        };
+
+        utterance.onboundary = (e) => {
+          if (e.name === "word" && typeof window.triggerSpeechPulse === "function") {
+            window.triggerSpeechPulse(1.0);
+          }
+        };
+
+        const onFinished = () => {
+          isSpeaking = false;
+          if (speechQueue.length > 0) {
+            pumpTts();
+          } else if (currentTurnId === null) {
+            // All speech finished and agent is done
+            if (typeof window.setSparkMode === "function") {
+              window.setSparkMode("NORMAL");
+            }
+          }
+        };
+
+        utterance.onend = onFinished;
+        utterance.onerror = onFinished;
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function stopTts() {
+        speechQueue = [];
+        pendingSpeechSentence = "";
+        isSpeaking = false;
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+        }
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 5. WEBSOCKET CLIENT & PROTOCOL INTEGRATION
+      // ─────────────────────────────────────────────────────────────
+      function updateConnectionStatus(state) {
+        if (convStatusBadge) {
+          if (state === "online") {
+            convStatusBadge.innerHTML = `<span class="conv-status-pulse"></span> ONLINE`;
+          } else if (state === "connecting") {
+            convStatusBadge.innerHTML = `<span class="conv-status-pulse connecting"></span> CONNECTING...`;
+          } else {
+            convStatusBadge.innerHTML = `<span class="conv-status-pulse offline"></span> OFFLINE (Bridge)`;
+          }
+        }
+        if (workspaceLiveBadge) {
+          if (state === "online") {
+            workspaceLiveBadge.innerHTML = `<span class="live-indicator-dot"></span> LIVE`;
+          } else {
+            workspaceLiveBadge.innerHTML = `<span class="live-indicator-dot offline"></span> OFFLINE`;
+          }
+        }
+      }
+
+      function connectBridge() {
+        if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+          return;
+        }
+
+        updateConnectionStatus("connecting");
+
+        try {
+          socket = new WebSocket(BRIDGE_WS_URL);
+        } catch {
+          scheduleReconnect();
+          return;
+        }
+
+        socket.onopen = () => {
+          isConnected = true;
+          reconnectAttempt = 0;
+          clearTimeout(reconnectTimer);
+          updateConnectionStatus("online");
+        };
+
+        socket.onmessage = (event) => {
+          let msg;
+          try {
+            msg = JSON.parse(event.data);
+          } catch {
+            return;
+          }
+
+          if (msg.type === "ready") {
+            const serverCount = (msg.servers || []).length;
+            updateConnectionStatus("online");
+            if (activeTaskData.steps.length === 1) {
+              activeTaskData.protocol = `JARVIS BRIDGE // ${serverCount} SERVERS`;
+              renderWorkspace();
+            }
+            return;
+          }
+
+          // Filter messages belonging to superseded turns
+          if (msg.ask && currentTurnId && msg.ask !== currentTurnId) {
+            return;
+          }
+
+          switch (msg.type) {
+            case "text": {
+              if (msg.delta) {
+                accumulatedText += msg.delta;
+                scheduleStreamRender();
+                feedTtsDelta(msg.delta);
+                // Switch reactor state to SPEAKING if voice has started
+                if (!isSpeaking && typeof window.setSparkMode === "function") {
+                  window.setSparkMode("SPEAKING");
+                }
+              }
+              break;
+            }
+
+            case "tool": {
+              if (msg.name) {
+                const info = prettyToolName(msg.name);
+                switchWorkspaceTab(info.category);
+                addWorkspaceStep(`Running ${info.name}`, info.sub, "active");
+                if (taskCountLabel) taskCountLabel.textContent = "1 TASK RUNNING";
+                if (typeof window.setSparkMode === "function") {
+                  window.setSparkMode("THINKING");
+                }
+              }
+              break;
+            }
+
+            case "panel": {
+              if (msg.panel) {
+                const p = msg.panel;
+                addWorkspaceResultItem(
+                  p.title || "Display Panel",
+                  p.subtitle || p.title || "Telemetry Report",
+                  typeof p.content === "string" ? p.content : JSON.stringify(p.content || p),
+                  "Panel",
+                  true
+                );
+              }
+              break;
+            }
+
+            case "blade": {
+              if (msg.blade) {
+                const b = msg.blade;
+                addWorkspaceResultItem(
+                  b.title || "Reference Blade",
+                  b.url || "Document Resource",
+                  b.snippet || b.content || "Structured reference material loaded.",
+                  "Blade",
+                  false
+                );
+              }
+              break;
+            }
+
+            case "ui": {
+              // Out-of-band UI control operation
+              break;
+            }
+
+            case "done": {
+              flushTts();
+              if (accumulatedText.trim().length === 0 && msg.text) {
+                accumulatedText = msg.text;
+                scheduleStreamRender();
+                feedTtsDelta(msg.text);
+              }
+              // Guarantee that active bubble never remains in Thinking...
+              if (activeSparkBubble && (!accumulatedText || accumulatedText.trim().length === 0 || activeSparkBubble.innerHTML.includes("Thinking..."))) {
+                const finalReply = (msg.text && msg.text.trim()) || "Done.";
+                accumulatedText = finalReply;
+                activeSparkBubble.innerHTML = escapeHtml(finalReply);
+                feedTtsDelta(finalReply);
+              }
+              currentTurnId = null;
+              completeWorkspaceTask("Execution complete");
+              // If not speaking, return to NORMAL immediately
+              if (!isSpeaking && speechQueue.length === 0) {
+                if (typeof window.setSparkMode === "function") {
+                  window.setSparkMode("NORMAL");
+                }
+              }
+              break;
+            }
+
+            case "error": {
+              stopTts();
+              currentTurnId = null;
+              const errMsg = msg.message || "An error occurred during turn execution.";
+              appendSystemNotice(errMsg, true);
+              failWorkspaceTask(errMsg);
+              if (typeof window.setSparkMode === "function") {
+                window.setSparkMode("NORMAL");
+              }
+              break;
+            }
+          }
+        };
+
+        socket.onerror = () => {
+          isConnected = false;
+          updateConnectionStatus("offline");
+        };
+
+        socket.onclose = () => {
+          isConnected = false;
+          updateConnectionStatus("offline");
+          scheduleReconnect();
+        };
+      }
+
+      function scheduleReconnect() {
+        if (reconnectAttempt >= RECONNECT_DELAYS.length) {
+          // Cease retrying until next user action to avoid infinite loops
+          return;
+        }
+        const delay = RECONNECT_DELAYS[reconnectAttempt];
+        reconnectAttempt += 1;
+        clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(() => {
+          connectBridge();
+        }, delay);
+      }
+
+      function sendUserQuery(text) {
+        if (!text || !text.trim()) return;
+        const query = text.trim();
+
+        // 1. Interrupt any turn currently in flight
+        if (currentTurnId || isSpeaking) {
+          stopTts();
+          if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: "interrupt" }));
+          }
+        }
+
+        // 2. Render user message in right conversation
+        appendUserMessage(query);
+
+        // 3. Prepare Spark response bubble
+        createSparkStreamingBubble();
+
+        // 4. Spark reactor switches to THINKING
+        if (typeof window.setSparkMode === "function") {
+          window.setSparkMode("THINKING");
+        }
+
+        // 5. Update workspace
+        activeTaskData.title = "SPARK TASK";
+        activeTaskData.protocol = "LOCAL AGENT RUNNER";
+        activeTaskData.meta = `Dispatched • ${formatCurrentTime()}`;
+        activeTaskData.steps = [
+          { text: "Command received: " + query.slice(0, 48), sub: "Forwarded to Claude Agent Bridge", status: "done" },
+          { text: "Analyzing query & selecting tools", sub: "Autonomous cognitive loop", status: "active" }
+        ];
+        if (taskCountLabel) taskCountLabel.textContent = "1 TASK RUNNING";
+        renderWorkspace();
+
+        // 6. Connect socket if needed
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+          appendSystemNotice("Connecting to Spark bridge (ws://localhost:8787)...");
+          connectBridge();
+          const checkReadyInterval = setInterval(() => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+              clearInterval(checkReadyInterval);
+              dispatchTurn(query);
+            }
+          }, 200);
+          setTimeout(() => clearInterval(checkReadyInterval), 6000);
+          return;
+        }
+
+        dispatchTurn(query);
+      }
+
+      function dispatchTurn(query) {
+        const id = "turn_" + Date.now();
+        currentTurnId = id;
+        try {
+          socket.send(JSON.stringify({ type: "ask", text: query, id }));
+        } catch {
+          appendSystemNotice("Failed to send command over bridge socket.", true);
+          failWorkspaceTask("Socket transmission failed");
+          if (typeof window.setSparkMode === "function") {
+            window.setSparkMode("NORMAL");
+          }
+        }
+      }
+
+      // Initial bridge connection on page boot
+      connectBridge();
+
+      // Form submission handler
+      if (convForm && convInput) {
+        convForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const text = convInput.value;
+          convInput.value = "";
+          sendUserQuery(text);
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 6. SPEECH RECOGNITION (VAD / VOICE INPUT)
+      // ─────────────────────────────────────────────────────────────
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let recognition = null;
+      let isListening = false;
+
+      if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+
+        recognition.onstart = () => {
+          isListening = true;
+          if (voiceBtn) voiceBtn.classList.add("recording");
+          if (typeof window.setSparkMode === "function") {
+            window.setSparkMode("LISTENING");
+          }
+        };
+
+        recognition.onresult = (event) => {
+          let transcript = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+          }
+          if (convInput) {
+            convInput.value = transcript;
+          }
+          if (event.results[0] && event.results[0].isFinal) {
+            recognition.stop();
+            if (convInput) convInput.value = "";
+            sendUserQuery(transcript);
+          }
+        };
+
+        recognition.onerror = () => {
+          isListening = false;
+          if (voiceBtn) voiceBtn.classList.remove("recording");
+          if (typeof window.setSparkMode === "function" && currentTurnId === null) {
+            window.setSparkMode("NORMAL");
+          }
+        };
+
+        recognition.onend = () => {
+          isListening = false;
+          if (voiceBtn) voiceBtn.classList.remove("recording");
+          if (typeof window.setSparkMode === "function" && currentTurnId === null && !isSpeaking) {
+            window.setSparkMode("NORMAL");
+          }
+        };
+      }
+
+      if (voiceBtn) {
+        voiceBtn.addEventListener("click", () => {
+          if (!SpeechRecognition) {
+            appendSystemNotice("Web Speech recognition is not supported in this browser. Please use Chrome or Edge.", true);
+            return;
+          }
+
+          if (isListening) {
+            recognition.stop();
+          } else {
+            // Barge-in: interrupt any active turn or speech
+            if (currentTurnId || isSpeaking) {
+              stopTts();
+              if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: "interrupt" }));
+              }
+            }
+            try {
+              recognition.start();
+            } catch {
+              // Already started or busy
+            }
+          }
+        });
+      }
+
+      // ─────────────────────────────────────────────────────────────
+      // 7. MOBILE VIEW SWITCHER (<= 980px)
+      // ─────────────────────────────────────────────────────────────
+      const mobileZoneBtns = document.querySelectorAll(".mobile-zone-btn");
+      const workspacePanel = document.getElementById("sparkWorkspace");
+      const conversationPanel = document.getElementById("sparkConversation");
+
+      mobileZoneBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const view = btn.getAttribute("data-view");
+          mobileZoneBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          if (workspacePanel) {
+            workspacePanel.classList.toggle("active-mobile-view", view === "workspace");
+          }
+          if (conversationPanel) {
+            conversationPanel.classList.toggle("active-mobile-view", view === "conversation");
+          }
+        });
+      });
+
+      // Cleanup on unload
+      window.addEventListener("beforeunload", () => {
+        stopTts();
+        if (socket) {
+          socket.close();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

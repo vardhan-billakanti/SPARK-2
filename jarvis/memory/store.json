@@ -1,0 +1,29 @@
+{
+  "user_preferences": {
+    "honorific": "none",
+    "do_not_call": "sir",
+    "voice_tone": "sweet_female",
+    "default_speech_language": "English",
+    "supported_input_languages": [
+      "English",
+      "Telugu",
+      "mixed Telugu-English"
+    ],
+    "music_preference": "Telugu and English Top Hits",
+    "browser_preference": "Google Chrome (foreground)"
+  },
+  "facts": {
+    "assistant_name": "SPARK",
+    "machine_os": "Windows 11",
+    "gpu_model": "NVIDIA GeForce RTX 4050 Laptop GPU",
+    "local_ai_model": "Qwen 2.5 3B (Ollama)",
+    "cloud_ai_model": "Google Gemini 3.6 Flash"
+  },
+  "project_context": {
+    "project_name": "SPARK 2",
+    "project_path": "C:\\Users\\vardh\\OneDrive\\Desktop\\MAINPROJECTS\\Spark 2",
+    "frontend_port": 5173,
+    "bridge_port": 8787
+  },
+  "session_history": []
+}
