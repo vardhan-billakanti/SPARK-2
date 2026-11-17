@@ -2990,11 +2990,7 @@
       }
 
       function scheduleReconnect() {
-        if (reconnectAttempt >= RECONNECT_DELAYS.length) {
-          // Cease retrying until next user action to avoid infinite loops
-          return;
-        }
-        const delay = RECONNECT_DELAYS[reconnectAttempt];
+        const delay = RECONNECT_DELAYS[Math.min(reconnectAttempt, RECONNECT_DELAYS.length - 1)];
         reconnectAttempt += 1;
         clearTimeout(reconnectTimer);
         reconnectTimer = setTimeout(() => {

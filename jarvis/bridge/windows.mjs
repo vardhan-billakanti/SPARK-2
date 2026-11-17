@@ -124,16 +124,76 @@ public class MediaCtrl {
 }
 
 /**
- * Brings a running application window to the foreground.
+ * Reliably launches any Windows executable, folder, or URI scheme.
+ * Avoids cmd.exe start path quoting bugs by leveraging PowerShell Start-Process directly.
+ */
+export function launchDesktopTarget(target, args = []) {
+  try {
+    const isUri = /^[a-z0-9+.-]+:/i.test(target) && !/^[a-z]:\\/i.test(target)
+    let script = ''
+    if (isUri) {
+      script = `Start-Process '${target.replace(/'/g, "''")}'`
+    } else {
+      const escapedTarget = target.replace(/'/g, "''")
+      const argString = args.length > 0 ? `-ArgumentList '${args.map((a) => a.replace(/'/g, "''")).join("', '")}'` : ''
+      script = `Start-Process -FilePath '${escapedTarget}' ${argString}`
+    }
+    const encoded = Buffer.from(script, 'utf16le').toString('base64')
+    execSync(`powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand ${encoded}`, {
+      timeout: 5000,
+      stdio: 'ignore',
+      windowsHide: true,
+    })
+    return true
+  } catch (err) {
+    console.error('[spark:launch] Launch failed:', err.message)
+    return false
+  }
+}
+
+/**
+ * Brings a running application window to the foreground, restoring if minimized.
  */
 export function activateWindow(appName) {
   try {
     const script = `
+Add-Type @"
+using System;
+using System.Runtime.InteropServices;
+public class WinAct {
+    [DllImport("user32.dll")]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll")]
+    public static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
+    [DllImport("user32.dll")]
+    public static extern bool IsIconic(IntPtr hWnd);
+
+    public const int SW_RESTORE = 9;
+    public const int SW_SHOW = 5;
+
+    public static void BringToFront(IntPtr hWnd) {
+        if (hWnd != IntPtr.Zero) {
+            if (IsIconic(hWnd)) {
+                ShowWindowAsync(hWnd, SW_RESTORE);
+            } else {
+                ShowWindowAsync(hWnd, SW_SHOW);
+            }
+            SetForegroundWindow(hWnd);
+        }
+    }
+}
+"@ -ErrorAction SilentlyContinue
+
 $wsh = New-Object -ComObject WScript.Shell
 $wsh.AppActivate('${appName}')
+
+$procs = Get-Process | Where-Object { $_.MainWindowHandle -ne 0 -and ($_.MainWindowTitle -match '${appName}' -or $_.ProcessName -match '${appName}') }
+foreach ($p in $procs) {
+    [WinAct]::BringToFront($p.MainWindowHandle)
+}
 `
     const encoded = Buffer.from(script, 'utf16le').toString('base64')
-    execSync(`powershell -NoProfile -EncodedCommand ${encoded}`, { timeout: 2000, stdio: 'ignore' })
+    execSync(`powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -EncodedCommand ${encoded}`, { timeout: 3000, stdio: 'ignore' })
   } catch {}
 }
 
@@ -166,9 +226,7 @@ export function resolveApplicationTarget(appName) {
     return { type: 'exe', target: 'wt.exe', displayName: 'Terminal', procPattern: /WindowsTerminal|wt/i }
   }
   if (norm === 'spotify') {
-    const spotifyLocal = path.join(LOCAL_APPDATA, 'Microsoft', 'WindowsApps', 'Spotify.exe')
-    const target = fs.existsSync(spotifyLocal) ? spotifyLocal : 'spotify.exe'
-    return { type: 'exe', target, displayName: 'Spotify', procPattern: /spotify/i }
+    return { type: 'uri', target: 'spotify:', displayName: 'Spotify', procPattern: /spotify/i }
   }
 
   // 2. Antigravity IDE (dynamic search in LOCALAPPDATA\Programs)
@@ -255,14 +313,18 @@ export function windowsServer({ allowWrites = false } = {}) {
             }
           }
 
+          // If Spotify has headless/dead zombie background processes without a visible window,
+          // clear stale background processes first so Spotify can launch fresh
+          if (resolved.target === 'spotify:' && isRunning && !isVisible) {
+            try {
+              execSync('taskkill /F /IM Spotify.exe', { stdio: 'ignore', timeout: 2000 })
+              await new Promise((r) => setTimeout(r, 400))
+            } catch {}
+          }
+
           try {
-            const cmdArgs = ['/c', 'start', '""', resolved.target, ...cleanArgs]
-            const child = spawn('cmd.exe', cmdArgs, {
-              detached: true,
-              stdio: 'ignore',
-              windowsHide: true,
-            })
-            child.unref()
+            const launched = launchDesktopTarget(resolved.target, cleanArgs)
+            if (!launched) throw new Error('Launch command failed')
 
             let verified = false
             for (let i = 0; i < 8; i++) {
@@ -321,26 +383,11 @@ export function windowsServer({ allowWrites = false } = {}) {
 
           try {
             const isUrl = /^https?:\/\//i.test(resolved)
-            let cmdArgs = []
 
             if (isUrl) {
-              const chromeDef = resolveApplicationTarget('chrome')
-              const chromeTarget = chromeDef.target || 'chrome'
-              cmdArgs = ['/c', 'start', '""', chromeTarget, resolved]
-            } else {
-              cmdArgs = ['/c', 'start', '""', 'explorer.exe', resolved]
-            }
-
-            const child = spawn('cmd.exe', cmdArgs, {
-              detached: true,
-              stdio: 'ignore',
-              windowsHide: true,
-            })
-            child.unref()
-
-            if (isUrl) {
+              launchDesktopTarget(resolved)
               await new Promise((r) => setTimeout(r, 800))
-              activateWindow('Google Chrome')
+              activateWindow('Chrome')
               const chromeRunning = isProcessRunning(/chrome/i)
               return {
                 content: [
@@ -349,7 +396,7 @@ export function windowsServer({ allowWrites = false } = {}) {
                     text: JSON.stringify({
                       status: chromeRunning ? 'COMPLETED' : 'UNVERIFIED',
                       verificationDetails: chromeRunning
-                        ? `Opened ${resolved} in Google Chrome.`
+                        ? `Opened ${resolved} in Chrome.`
                         : `Attempted to open URL, but Chrome process was not detected.`,
                       url: resolved,
                     }, null, 2),
@@ -358,6 +405,7 @@ export function windowsServer({ allowWrites = false } = {}) {
               }
             }
 
+            launchDesktopTarget(resolved)
             return {
               content: [
                 {
@@ -417,12 +465,7 @@ export function windowsServer({ allowWrites = false } = {}) {
             if (action === 'play_spotify') {
               const searchTerm = (query || 'Top Hits').trim()
               const uri = `spotify:search:${encodeURIComponent(searchTerm)}`
-              const child = spawn('cmd.exe', ['/c', 'start', '""', uri], {
-                detached: true,
-                stdio: 'ignore',
-                windowsHide: true,
-              })
-              child.unref()
+              launchDesktopTarget(uri)
 
               await new Promise((r) => setTimeout(r, 900))
               activateWindow('Spotify')

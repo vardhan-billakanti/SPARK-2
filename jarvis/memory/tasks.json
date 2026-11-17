@@ -23,6 +23,42 @@
       "updatedAt": "2026-11-17T15:20:14.375Z",
       "steps": [],
       "notes": "[8:50:14 pm] Halfway through scan\n[8:50:14 pm] Task cancelled by user/agent."
+    },
+    {
+      "id": "task_1794935456228_j8vji",
+      "title": "System Diagnostics",
+      "description": "Run full verification scan",
+      "priority": "high",
+      "status": "FAILED",
+      "progress": 50,
+      "createdAt": "2026-11-17T17:10:56.228Z",
+      "updatedAt": "2026-11-17T17:10:56.242Z",
+      "steps": [],
+      "notes": "[10:40:56 pm] Halfway through scan\n[10:40:56 pm] Task cancelled by user/agent."
+    },
+    {
+      "id": "task_1794935820880_jz71k",
+      "title": "System Diagnostics",
+      "description": "Run full verification scan",
+      "priority": "high",
+      "status": "FAILED",
+      "progress": 50,
+      "createdAt": "2026-11-17T17:17:00.880Z",
+      "updatedAt": "2026-11-17T17:17:00.894Z",
+      "steps": [],
+      "notes": "[10:47:00 pm] Halfway through scan\n[10:47:00 pm] Task cancelled by user/agent."
+    },
+    {
+      "id": "task_1794936629186_9ocxo",
+      "title": "System Diagnostics",
+      "description": "Run full verification scan",
+      "priority": "high",
+      "status": "FAILED",
+      "progress": 50,
+      "createdAt": "2026-11-17T17:30:29.186Z",
+      "updatedAt": "2026-11-17T17:30:29.200Z",
+      "steps": [],
+      "notes": "[11:00:29 pm] Halfway through scan\n[11:00:29 pm] Task cancelled by user/agent."
     }
   ]
 }
